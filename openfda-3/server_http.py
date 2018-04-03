@@ -19,8 +19,6 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
-        
-        
         headers = {'User-Agent': 'http-client'}
 
         conn = http.client.HTTPSConnection("api.fda.gov")
@@ -49,7 +47,7 @@ print("serving at port", PORT)
 try:
     httpd.serve_forever()
 except KeyboardInterrupt:
-        pass
+    pass
 
 httpd.server_close()
 print("")
