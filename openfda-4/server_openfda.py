@@ -19,7 +19,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         if self.path == "/":
             # Send message back to client
             with open("search.html") as file_form:
-                message = file_form.read()
+                form = file_form.read()
                 self.wfile.write(bytes(form, "utf8"))
         elif "search" in self.path:
             params = self.path.split("?")[1]
