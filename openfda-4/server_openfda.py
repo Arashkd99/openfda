@@ -1,36 +1,39 @@
 import http.server
 import socketserver
 
-PORT = 8006
+# -- IP and the port of the server
+IP = "localhost"  # Localhost means "I": your local machine
+PORT = 8009
 
-socketserver.TCPServer.allow_reuse_address = True
 
 # HTTPRequestHandler class
 class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     # GET
     def do_GET(self):
-        # Send response status code
         self.send_response(200)
-
-        # Send headers
-        self.send_header('Content-type','text/html')
+        self.send_header('Content-type', 'text/html')
         self.end_headers()
+        with open("search.html","r") as f:
+             message = f.read()
 
-        if self.path == "/":
-            # Send message back to client
-            with open("search.html") as file_form:
-                form = file_form.read()
-                self.wfile.write(bytes(form, "utf8"))
-        elif "search" in self.path:
-            params = self.path.split("?")[1]
-            drug = params.split("&")[0].split("=")[1]
-            limit = params.split("&")[1].split("=")[1]
-            self.wfile.write(bytes(drug+" "+limit, "utf8"))
+        self.wfile.write(bytes(message, "utf8"))
+        print("File served")
         return
 
-Handler = http.server.SimpleHTTPRequestHandler
+
+# Handler = http.server.SimpleHTTPRequestHandler
 Handler = testHTTPRequestHandler
 
-httpd = socketserver.TCPServer(("", PORT), Handler)
+httpd = socketserver.TCPServer((IP, PORT), Handler)
 print("serving at port", PORT)
-httpd.serve_forever()
+print("prueba")
+try:
+    httpd.serve_forever()
+except KeyboardInterrupt:
+        pass
+
+httpd.server_close()
+print("")
+print("Server stopped!")
+
+

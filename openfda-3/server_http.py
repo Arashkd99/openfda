@@ -3,9 +3,9 @@ import socketserver
 import http.client
 import json
 
-# -- IP and the port of the server
+# IP and the port of the server
 IP = "localhost"  # Localhost means "I": your local machine
-PORT = 8002
+PORT = 8008
 
 
 # HTTPRequestHandler class
@@ -54,4 +54,3 @@ print("")
 print("Server stopped!")
 
 
-# https://github.com/joshmaker/simple-python-webserver/blob/master/server.py
