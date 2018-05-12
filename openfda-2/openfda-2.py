@@ -13,3 +13,5 @@ conn.close()
 repos = json.loads(repos_raw)
 print("The name of the manufacter is", repos['results'][0]['openfda']['manufacturer_name'])
 print("The name of the manufacter is", repos['results'][2]['openfda']['manufacturer_name'])
+
+# Arash Kazemi Díaz

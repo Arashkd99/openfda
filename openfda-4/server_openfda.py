@@ -1,39 +1,54 @@
 import http.server
+import http.client
 import socketserver
+import json
 
-# -- IP and the port of the server
-IP = "localhost"  # Localhost means "I": your local machine
-PORT = 8009
+socketserver.TCPServer.allow_reuse_address = True
 
+PORT = 8005
 
-# HTTPRequestHandler class
 class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
-    # GET
     def do_GET(self):
+
         self.send_response(200)
+
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        with open("search.html","r") as f:
-             message = f.read()
+        if self.path == "/":
+            with open("search.html") as f:
+                message = f.read()
+                self.wfile.write(bytes(message, "utf8"))
 
-        self.wfile.write(bytes(message, "utf8"))
-        print("File served")
+        elif "search" in self.path:
+            params = self.path.split("?")[1]
+            drug = params.split("&")[0].split("=")[1]
+            limit = params.split("&")[1].split("=")[1]
+            headers = {'User-Agent': 'http-client'}
+
+            conn = http.client.HTTPSConnection("api.fda.gov")
+            conn.request("GET", '/drug/label.json?search=generic_name:' + drug + "&limit=" + limit, None, headers)
+            r1 = conn.getresponse()
+            print(r1.status, r1.reason)
+            repos_raw = r1.read().decode("utf-8")
+            conn.close()
+
+            drugs = json.loads(repos_raw)
+            total_drugs = ""
+            for drug in drugs['results']:
+                drugs_id = "<ol>" + drug['id'] + "</ol>"
+                total_drugs = total_drugs + drugs_id
+
+
+            self.wfile.write(bytes(total_drugs, "utf8"))
+
         return
 
 
-# Handler = http.server.SimpleHTTPRequestHandler
+Handler = http.server.SimpleHTTPRequestHandler
 Handler = testHTTPRequestHandler
 
-httpd = socketserver.TCPServer((IP, PORT), Handler)
+httpd = socketserver.TCPServer(("", PORT), Handler)
 print("serving at port", PORT)
-print("prueba")
-try:
-    httpd.serve_forever()
-except KeyboardInterrupt:
-        pass
+httpd.serve_forever()
 
-httpd.server_close()
-print("")
-print("Server stopped!")
-
-
+# Arash Kazemi Díaz

@@ -1,11 +1,37 @@
+IP = "localhost"  # Localhost means "I": your local machine
+PORT = 8006
 import http.server
 import socketserver
 import http.client
 import json
 
-# IP and the port of the server
-IP = "localhost"  # Localhost means "I": your local machine
-PORT = 8008
+headers = {'User-Agent': 'http-client'}
+
+conn = http.client.HTTPSConnection("api.fda.gov")
+conn.request("GET", "/drug/label.json?&limit=10", None, headers)
+r1 = conn.getresponse()
+print(r1.status, r1.reason)
+repos_raw = r1.read().decode("utf-8")
+conn.close()
+
+repos = json.loads(repos_raw)
+names = []
+
+for element in repos["results"]:
+    if element["openfda"]=={}:
+        names.append("")
+    else:
+        names.append(element["openfda"]["generic_name"][0])
+
+
+intro="<ol>"+"\n"
+end ="</ol>"+"\n"
+with open("htmlopenfda3.html","w") as f:
+    f.write(intro)
+    for element in names:
+        elementli = "<li>" + element + "</li>" + "\n"
+        f.write(elementli)
+    f.write(end)
 
 
 # HTTPRequestHandler class
@@ -14,27 +40,13 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         # Send response status code
         self.send_response(200)
-
         # Send headers
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
-        headers = {'User-Agent': 'http-client'}
-
-        conn = http.client.HTTPSConnection("api.fda.gov")
-        conn.request("GET", "/drug/label.json?limit=10", None, headers)
-        r1 = conn.getresponse()
-        print(r1.status, r1.reason)
-        repos_raw = r1.read().decode("utf-8")
-        conn.close()
-
-        repos = json.loads(repos_raw)
-
-        for elements in repos["results"]:
-            message = (elements['id'] + '\n')
-            # Send message back to client
-            # Write content as utf-8 data
-            self.wfile.write(bytes(message, "utf8"))
+        with open("htmlopenfda3.html", "r") as f:
+             message= f.read()
+        self.wfile.write(bytes(message, "utf8"))
         print("File served!")
         return
 
@@ -53,4 +65,4 @@ httpd.server_close()
 print("")
 print("Server stopped!")
 
-
+# Arash Kazemi Díaz
