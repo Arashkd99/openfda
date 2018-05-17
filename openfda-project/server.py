@@ -6,7 +6,7 @@ import json
 
 socketserver.TCPServer.allow_reuse_address = True
 
-PORT = 8005
+PORT = 8000
 
 class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     # Code for the active ingredient and company
